@@ -57,15 +57,25 @@
 								pathLeft:	null,
 								pathRight:	nodes[1],
 								name:	"Main Entrance"
+							},
+							{
+								x:	1365,
+								y:	520,
+								pathUp:	null,
+								pathDown:	null,
+								pathLeft:	nodes[11],
+								pathRight:	null,
+								name:	"Escalator"
 							}
+							
 						];
 		 	}
 		 	
 			function initShops(){
 			 	shops =	[
 						 {
-							entryx:	586,
-							entryy:	647,
+							x:	586,
+							y:	647,
 							exitx:	586,
 							exity:	647,
 							entryNode:	nodes[1],
@@ -73,8 +83,8 @@
 							name:	"shop_1"
 	   					 },
 			             {
-	   						entryx:	820,
-	   						entryy:	370,
+	   						x:	820,
+	   						y:	370,
 	   						exitx:	901,
 							exity:	433,
 							entryNode:	nodes[13],
@@ -82,8 +92,8 @@
 							name:	"shop_2"
 						},
 						{
-							entryx:	1210,
-							entryy:	940,
+							x:	1210,
+							y:	940,
 							exitx:	1210,
 							exity:	940,
 							entryNode:	nodes[12],
@@ -91,8 +101,8 @@
 							name:	"shop_3"
 						},
 						{
-							entryx:	1286,
-							entryy:	550,
+							x:	1286,
+							y:	550,
 							exitx:	1286,
 							exity:	550,
 							entryNode:	nodes[11],
@@ -243,6 +253,8 @@
 		 	var previouslyVisitedShop = null;
 		 	var nextStartNode = null;
 		 	var firstNode = null;
+		 	var exitNode = null;
+		 	var exitPath = [];
 			
 			function showPointOnMap(node, type){
 				var canvasVar = document.getElementById("canvas");
@@ -293,7 +305,7 @@
 					drawPath(path[i].x, path[i].y, path[i+1].x, path[i+1].y);
 				}
 				
-				drawPath(firstNode.x, firstNode.y, currentShopToVisit.entryx, currentShopToVisit.entryy);
+				drawPath(firstNode.x, firstNode.y, currentShopToVisit.x, currentShopToVisit.y);
 			} // END : showPathForCurrentShop
 			
 			function closeRouteAndShow(){
@@ -367,11 +379,10 @@
 		 	} // END : getDistanceObjWithSpecifiedValues
 			
 			function getClosestShop(point){
-				var start = point;
 				var distanceBetweenShopsAndStartNode = [];
 				
 				$.each(shops, function(i,shop){
-					distanceBetweenShopsAndStartNode.push(getDistanceObj(shop, start));
+					distanceBetweenShopsAndStartNode.push(getDistanceObj(shop, point));
 				});
 				
 				var objWithSmallestDistance = sortTheDistanceArrayAndReturnTheSmallest(distanceBetweenShopsAndStartNode);
@@ -463,9 +474,51 @@
 				return sortedDistanceFromAllSides[ignoreCount].node;
 			} // END : findClosestNodeFromCurrentPosition
 			
+			function findClosestNodeFromCurrentPosition_exit(nodeToMap, ignoreCount){
+				var distanceFromAllSides = [];
+			
+				if(nodeToMap.pathUp != null){
+					distanceFromAllSides.push(getDistanceObj(nodeToMap.pathUp, exitNode));
+				} else {
+					distanceFromAllSides.push(getDistanceObjWithSpecifiedValues(999999, nodeToMap.pathUp));
+				}
+				
+				if(nodeToMap.pathDown != null){
+					distanceFromAllSides.push(getDistanceObj(nodeToMap.pathDown, exitNode));
+				} else {
+					distanceFromAllSides.push(getDistanceObjWithSpecifiedValues(999999, nodeToMap.pathDown));
+				}
+				
+				if(nodeToMap.pathLeft != null){
+					distanceFromAllSides.push(getDistanceObj(nodeToMap.pathLeft, exitNode));
+				} else {
+					distanceFromAllSides.push(getDistanceObjWithSpecifiedValues(999999, nodeToMap.pathLeft));
+				}
+				
+				if(nodeToMap.pathRight != null){
+					distanceFromAllSides.push(getDistanceObj(nodeToMap.pathRight, exitNode));
+				} else {
+					distanceFromAllSides.push(getDistanceObjWithSpecifiedValues(999999, nodeToMap.pathRight));
+				}
+				
+				var sortedDistanceFromAllSides = distanceFromAllSides.sort(SortByDistance);
+				return sortedDistanceFromAllSides[ignoreCount].node;
+			} // END : findClosestNodeFromCurrentPosition
+			
 			function isAlreadyVisited(nodeA){
 				var alreadyVisitedNode = false;
 				$.each(movement, function(i, move){
+					if(areSameNode(move, nodeA)){
+						alreadyVisitedNode = true;
+					}
+				});
+				
+				return alreadyVisitedNode;
+			} // END : isAlreadyVisited
+			
+			function isAlreadyVisited_exit(nodeA){
+				var alreadyVisitedNode = false;
+				$.each(exitPath, function(i, move){
 					if(areSameNode(move, nodeA)){
 						alreadyVisitedNode = true;
 					}
@@ -495,8 +548,58 @@
 				}
 			} // END : route
 	 		
+			function getClosestExit(point){
+				var distanceBetweenShopsAndStartNode = [];
+				
+				$.each(entries, function(i, entry){
+					distanceBetweenShopsAndStartNode.push(getDistanceObj(entry, point));
+				});
+				
+				var objWithSmallestDistance = sortTheDistanceArrayAndReturnTheSmallest(distanceBetweenShopsAndStartNode);
+				return objWithSmallestDistance.node;
+			} // END : getClosestShop
+			
+			function showExit(){
+				canvasContext.strokeStyle = "#311208";
+				if(previouslyVisitedShop && !areSameNode(previouslyVisitedShop.entryNode, previouslyVisitedShop.exitNode)){
+					drawPath(previouslyVisitedShop.exitx, previouslyVisitedShop.exity, exitPath[0].x, exitPath[0].y);
+				}
+				for(i = 0 ; i < exitPath.length-1 ; i++){
+					drawPath(exitPath[i].x, exitPath[i].y, exitPath[i+1].x, exitPath[i+1].y);
+				}
+				var l = exitPath.length;
+				drawPath(exitPath[l-1].x, exitPath[l-1].y, exitNode.x, exitNode.y);
+			}
+			
+			function routeToExit(node){
+				console.log("Exit() called with " , node.name);
+				if(areTwoNodesDirectlyReachable(exitNode, node)){
+					exitPath.push(node);
+					showExit();
+				} else {
+					exitPath.push(node);
+					console.log("Exit() " , node.name ," is pushed to exitPath");
+					var nodeToCheckNext = null;
+					for(n = 0 ; n < 4 ; n++){
+						var next = findClosestNodeFromCurrentPosition_exit(node,n);
+						if(!isAlreadyVisited_exit(next)){
+							nodeToCheckNext = next;
+							break;
+						}
+					}
+					routeToExit(nodeToCheckNext);
+				}
+			} // END : routeToExit
+			
+			
+			function exitNow(currentPosition){
+				console.log("exit called");
+				exitNode = getClosestExit(currentPosition);
+				routeToExit(currentPosition);
+			}
+			
 			function letsBegin(){
-				nextStartNode = entries[0];
+				nextStartNode = entries[1];
 				do{
 					currentStartNode = nextStartNode;
 					previouslyVisitedShop = currentShopToVisit;
@@ -505,7 +608,10 @@
 					firstNode = getEntryNodeOfShop(currentShopToVisit);
 					nextStartNode = getExitNodeOfShop(currentShopToVisit);
 					route(currentStartNode);
+					alert("moving ahead");
 				}while(doWeNeedToContinue());
+				exitNow(nextStartNode);
+
 			}
 			
 			
