@@ -23,19 +23,24 @@
 	
 		function performRouting(){
 			
+			var canvasVar = document.getElementById("canvas");
+			var canvasContext = canvasVar.getContext("2d");
+			
 			var nodes = [
 		 	             {},
-		 			{x:	545,	y:	647},
-		 			{x:	545,	y:	315},
-		 			{x:	545,	y:	980},
-		 			{x:	945,	y:	315},
-		 			{x:	945,	y:	980},
-		 			{x:	1335,	y:	315},
-		 			{x:	1335,	y:	980},
-		 			{x:	945,	y:	647},
-		 			{x: 545,	y:	430},
-		 			{x: 945,	y:	433},
-		 			{x: 1335,	y:	550}
+		 			{x:	545,	y:	647},//1
+		 			{x:	545,	y:	315},//2
+		 			{x:	545,	y:	980},//3
+		 			{x:	945,	y:	315},//4
+		 			{x:	945,	y:	980},//5
+		 			{x:	1335,	y:	315},//6
+		 			{x:	1335,	y:	980},//7
+		 			{x:	945,	y:	647},//8
+		 			{x: 545,	y:	430},//9
+		 			{x: 945,	y:	433},//10
+		 			{x: 1335,	y:	550},//11
+		 			{x: 1210,	y:	983},//12
+		 			{x: 820,	y:	315}//13
 	 			];
 
 		 	var entries = [];
@@ -59,39 +64,39 @@
 			function initShops(){
 			 	shops =	[
 						 {
-							x:	586,
-							y:	647,
-							pathUp:	null,
-							pathDown:	null,
-							pathLeft:	nodes[1],
-							pathRight:	null,
+							entryx:	586,
+							entryy:	647,
+							exitx:	586,
+							exity:	647,
+							entryNode:	nodes[1],
+							exitNode:	nodes[1],
 							name:	"shop_1"
 	   					 },
 			             {
-							x:	900,
-							y:	433,
-							pathUp:	nodes[4],
-							pathDown:	nodes[8],
-							pathLeft:	null,
-							pathRight:	nodes[10],
+	   						entryx:	820,
+	   						entryy:	370,
+	   						exitx:	901,
+							exity:	433,
+							entryNode:	nodes[13],
+							exitNode:	nodes[10],
 							name:	"shop_2"
 						},
 						{
-							x:	1210,
-							y:	940,
-							pathUp:	null,
-							pathDown:	null,
-							pathLeft:	nodes[5],
-							pathRight:	nodes[7],
+							entryx:	1210,
+							entryy:	940,
+							exitx:	1210,
+							exity:	940,
+							entryNode:	nodes[12],
+							exitNode:	nodes[12],
 							name:	"shop_3"
 						},
 						{
-							x:	1286,
-							y:	550,
-							pathUp:	nodes[6],
-							pathDown:	nodes[7],
-							pathLeft:	null,
-							pathRight:	nodes[11],
+							entryx:	1286,
+							entryy:	550,
+							exitx:	1286,
+							exity:	550,
+							entryNode:	nodes[11],
+							exitNode:	nodes[11],
 							name:	"shop_4"
 						}
 					];
@@ -115,7 +120,7 @@
 						pathUp:	null,
 						pathDown:	nodes[9],
 						pathLeft:	null,
-						pathRight:	nodes[4],
+						pathRight:	nodes[13],
 						name:	"node_2"
 					};
 				
@@ -133,8 +138,8 @@
 						x:	945,
 						y:	315,
 						pathUp:	null,
-						pathDown:	nodes[5],
-						pathLeft:	nodes[2],
+						pathDown:	nodes[10],
+						pathLeft:	nodes[13],
 						pathRight:	nodes[6],
 						name:	"node_4"
 					};
@@ -145,7 +150,7 @@
 						pathUp:	nodes[8],
 						pathDown:	null,
 						pathLeft:	nodes[3],
-						pathRight:	nodes[7],
+						pathRight:	nodes[12],
 						name:	"node_5"
 					};
 				
@@ -153,7 +158,7 @@
 						x:	1335,
 						y:	315,
 						pathUp:	null,
-						pathDown:	nodes[7],
+						pathDown:	nodes[11],
 						pathLeft:	nodes[4],
 						pathRight:	null,
 						name:	"node_6"
@@ -162,9 +167,9 @@
 				nodes[7] = {
 						x:	1335,
 						y:	980,
-						pathUp:	nodes[6],
+						pathUp:	nodes[11],
 						pathDown:	null,
-						pathLeft:	nodes[5],
+						pathLeft:	nodes[12],
 						pathRight:	null,
 						name:	"node_7"
 					};
@@ -208,17 +213,36 @@
 						pathRight:	null,
 						name:	"node_11"
 						};
-	
 				
+				nodes[12] = {
+						x:	1210,
+						y:	983,
+						pathUp:	null,
+						pathDown:	null,
+						pathLeft:	nodes[5],
+						pathRight:	nodes[7],
+						name:	"node_12"
+						};
 				
-		 		
+				nodes[13] = {
+						x:	820,
+						y:	315,
+						pathUp:	null,
+						pathDown:	null,
+						pathLeft:	nodes[2],
+						pathRight:	nodes[4],
+						name:	"node_13"
+						};
+
 			}
 		 	
 		 	var path = [];
 		 	var movement = [];
 		 	var currentStartNode = null;
-		 	var currentShopToVisit = null; 
-		 	var nextStart = null;
+		 	var currentShopToVisit = null;
+		 	var previouslyVisitedShop = null;
+		 	var nextStartNode = null;
+		 	var firstNode = null;
 			
 			function showPointOnMap(node, type){
 				var canvasVar = document.getElementById("canvas");
@@ -246,7 +270,7 @@
 			
 			var flagToAlternateMapLineColor = false;
 			
-			function drawPath(x1, y1, x2, y2, canvasContext){
+			function drawPath(x1, y1, x2, y2){
 				canvasContext.lineWidth = 5;
 				canvasContext.beginPath();
 				canvasContext.moveTo(x1,y1);
@@ -255,8 +279,6 @@
 			} // END : drawPath
 			
 			function showPathForCurrentShop(){
-				var canvasVar = document.getElementById("canvas");
-				var canvasContext = canvasVar.getContext("2d");
 				if(flagToAlternateMapLineColor){
 					canvasContext.strokeStyle = "#D41CB0";
 					flagToAlternateMapLineColor = false;
@@ -264,17 +286,21 @@
 					canvasContext.strokeStyle = "#24781D";
 					flagToAlternateMapLineColor = true;
 				}
+				if(previouslyVisitedShop && !areSameNode(previouslyVisitedShop.entryNode, previouslyVisitedShop.exitNode)){
+					drawPath(previouslyVisitedShop.exitx, previouslyVisitedShop.exity, path[0].x, path[0].y);
+				}				
 				for(i = 0 ; i < path.length-1 ; i++){
-					drawPath(path[i].x, path[i].y, path[i+1].x, path[i+1].y, canvasContext);
+					drawPath(path[i].x, path[i].y, path[i+1].x, path[i+1].y);
 				}
+				
+				drawPath(firstNode.x, firstNode.y, currentShopToVisit.entryx, currentShopToVisit.entryy);
 			} // END : showPathForCurrentShop
 			
 			function closeRouteAndShow(){
 				$.each(movement, function(i, item){
 					path.push(item);
 				});
-				path.push(nextStart);
-				path.push(currentShopToVisit);
+				path.push(firstNode);
 				console.log("Route prepared for ",currentShopToVisit.name);
 				showPathForCurrentShop();
 				path = [];
@@ -368,38 +394,21 @@
 				}
 			} // END : areSameNode
 			
-			function findClosestNode(nodeToMap){
-				var distanceFromAllSides = [];
+			function getEntryNodeOfShop(shopNode){
+				if(shopNode.entryNode){
+					return shopNode.entryNode;
+				} else{
+					return shopNode;
+				}
+			} // END : getEntryNodeOfShop
 			
-				if(nodeToMap.pathUp != null){
-					distanceFromAllSides.push(getDistanceObj(nodeToMap.pathUp, nodeToMap));
-				} else {
-					distanceFromAllSides.push(getDistanceObjWithSpecifiedValues(999999, nodeToMap.pathUp));
+			function getExitNodeOfShop(shopNode){
+				if(shopNode.exitNode){
+					return shopNode.exitNode;
+				} else{
+					return shopNode;
 				}
-				
-				if(nodeToMap.pathDown != null){
-					distanceFromAllSides.push(getDistanceObj(nodeToMap.pathDown, nodeToMap));
-				} else {
-					distanceFromAllSides.push(getDistanceObjWithSpecifiedValues(999999, nodeToMap.pathDown));
-				}
-				
-				if(nodeToMap.pathLeft != null){
-					distanceFromAllSides.push(getDistanceObj(nodeToMap.pathLeft, nodeToMap));
-				} else {
-					distanceFromAllSides.push(getDistanceObjWithSpecifiedValues(999999, nodeToMap.pathLeft));
-				}
-				
-				if(nodeToMap.pathRight != null){
-					distanceFromAllSides.push(getDistanceObj(nodeToMap.pathRight, nodeToMap));
-				} else {
-					distanceFromAllSides.push(getDistanceObjWithSpecifiedValues(999999, nodeToMap.pathRight));
-				}
-				
-				var objWithSmallestDistance = sortTheDistanceArrayAndReturnTheSmallest(distanceFromAllSides);
-
-				return objWithSmallestDistance.node;
-			} // END : findClosestNodeForShop
-			
+			} // END : getExitNodeOfShop
 			
 			function areTwoNodesDirectlyReachable(nodeA, nodeB){
 				// From nodeA
@@ -427,25 +436,25 @@
 				var distanceFromAllSides = [];
 			
 				if(nodeToMap.pathUp != null){
-					distanceFromAllSides.push(getDistanceObj(nodeToMap.pathUp, currentStartNode));
+					distanceFromAllSides.push(getDistanceObj(nodeToMap.pathUp, firstNode));
 				} else {
 					distanceFromAllSides.push(getDistanceObjWithSpecifiedValues(999999, nodeToMap.pathUp));
 				}
 				
 				if(nodeToMap.pathDown != null){
-					distanceFromAllSides.push(getDistanceObj(nodeToMap.pathDown, currentStartNode));
+					distanceFromAllSides.push(getDistanceObj(nodeToMap.pathDown, firstNode));
 				} else {
 					distanceFromAllSides.push(getDistanceObjWithSpecifiedValues(999999, nodeToMap.pathDown));
 				}
 				
 				if(nodeToMap.pathLeft != null){
-					distanceFromAllSides.push(getDistanceObj(nodeToMap.pathLeft, currentStartNode));
+					distanceFromAllSides.push(getDistanceObj(nodeToMap.pathLeft, firstNode));
 				} else {
 					distanceFromAllSides.push(getDistanceObjWithSpecifiedValues(999999, nodeToMap.pathLeft));
 				}
 				
 				if(nodeToMap.pathRight != null){
-					distanceFromAllSides.push(getDistanceObj(nodeToMap.pathRight, currentStartNode));
+					distanceFromAllSides.push(getDistanceObj(nodeToMap.pathRight, firstNode));
 				} else {
 					distanceFromAllSides.push(getDistanceObjWithSpecifiedValues(999999, nodeToMap.pathRight));
 				}
@@ -468,7 +477,7 @@
 			
 			function route(node){
 				console.log("route() called with " , node.name);
-				if(areTwoNodesDirectlyReachable(nextStart, node)){
+				if(areTwoNodesDirectlyReachable(firstNode, node)){
 					movement.push(node);
 					closeRouteAndShow();
 				} else {
@@ -487,12 +496,14 @@
 			} // END : route
 	 		
 			function letsBegin(){
-				nextStart = entries[0];
+				nextStartNode = entries[0];
 				do{
-					currentStartNode = nextStart;
+					currentStartNode = nextStartNode;
+					previouslyVisitedShop = currentShopToVisit;
 					currentShopToVisit = getClosestShop(currentStartNode);
 					removeVisitedShopFromList(currentShopToVisit);
-					nextStart = findClosestNode(currentShopToVisit) 
+					firstNode = getEntryNodeOfShop(currentShopToVisit);
+					nextStartNode = getExitNodeOfShop(currentShopToVisit);
 					route(currentStartNode);
 				}while(doWeNeedToContinue());
 			}
