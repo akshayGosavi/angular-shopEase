@@ -13,6 +13,7 @@ function performRouting(){
  	var firstNodeFromShop = null;
  	var currentRouteNode = null;
  	
+ 	var movement = [];
  	
  	function getAllPossibleNodesFrom(node){
  		var nodeArr = [];
@@ -153,16 +154,56 @@ function performRouting(){
  	
  	function areTwoNodesConnected(NodeToCheck ,NodeFrom){
  		var isConnected = false;
- 		var nodelist = getAllPossibleNodesFrom(nodeFrom);
- 		$.each(nodeList, function(i, obj){
- 			if(NodeToCheck === obj)
+ 		var nodelist = getAllPossibleNodesFrom(NodeFrom);
+ 		$.each(nodelist, function(i, obj){
+ 			if(NodeToCheck === obj){
+ 				isConnected = true;
+ 			}
  		});
  		
  		return isConnected;
  	}
  	
- 	function route(){
+ 	function getCommonNodesElseNull( nodeA, nodeB){
+ 		var nodelistA = getAllPossibleNodesFrom(nodeA);
+ 		var nodelistB = getAllPossibleNodesFrom(nodeB);
  		
+ 		var commonNodeList = null;
+ 		
+ 		$.each(nodelistA, function(i, objA){
+ 			$.each(nodelistB, function(j, objB){
+ 				if(objA === objB){
+ 					commonNodeList.push(objA);
+ 				}
+ 			});
+ 		});
+ 		
+ 		if( commonNodeList != null){
+ 			return commonNodeList;
+ 		} else{
+ 			return null;
+ 		}
+ 	}
+ 	
+ 	
+ 	function route(node){
+ 		if(areTwoNodesConnected(firstNodeFromShop, node)){
+ 			movement.push(node);
+ 			//end of road now print the path 
+ 		} else {
+ 			movement.push(node);
+ 			var nextNode = null;
+ 			if(getCommonNodesElseNull(firstNodeFromShop, node) != null){
+ 				var commonNodes = getCommonNodesElseNull(firstNodeFromShop, node);
+ 				if(commonNodes.length > 1){
+ 					nextNode = chooseNextNode(commonNodes); // need to implement
+ 				} else {
+ 					nextNode = commonNodes[0];
+ 				}
+ 			} else {
+ 				nextNode = getNextCloseNode(node); // need to implement
+ 			}
+ 		}
  	}
  	
  	function theFirstStep(){
@@ -172,7 +213,7 @@ function performRouting(){
  			currentRouteNode = firstNodeFromShop;
  			shopToVisit = getShopNodeByName(shoppingList[0]);
  			firstNodeFromShop = getNodeCloseToSpecificNode(currentRouteNode, shopToVisit);
- 			route();
+ 			route(currentRouteNode);
  		}while( cnt < shoppingList.length);
  	}
  	
