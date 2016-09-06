@@ -1,42 +1,9 @@
-function loadJSON(callback, file) {   
-    var xobj = new XMLHttpRequest();
-    xobj.overrideMimeType("application/json");
-    xobj.onreadystatechange = function () {
-      if (xobj.readyState == 4 && xobj.status == "200") {
-        // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
-        callback(xobj.responseText);
-      }
-    };
-    xobj.open('GET', file, true); 
-    xobj.send(null);  
- }
+/**
+ * Contains Functions to initialize various node lists 
+ * for time being hard coded the Json to variables 
+ * but ideally it should load from json file other wise angular controller should populate that 
+ * */
 
-/*function initShopNodes() {
-	loadJSON(function(response) {
-		var actual_JSON = JSON.parse(response);
-		return actual_JSON;
-		//displayShopsOnMap(actual_JSON);
-	},"shops.json");
-}
-
-function initRouteNodes() {
-	loadJSON(function(response) {
-		var actual_JSON = JSON.parse(response);
-		//displayNodesOnMap(actual_JSON, "route");
-		return actual_JSON;
-	},"nodes.json");
-}
-
-function initEntryNodes() {
-	loadJSON(function(response) {
-		var actual_JSON = JSON.parse(response);
-		return actual_JSON;
-		//displayNodesOnMap(actual_JSON, "entry");
-	},"entry.json");
-}
-*/
-
-// for time being hard coing the JSONs - above functions are not working 
 function initShopNodes() {
 	var shops = [
 	         {
@@ -456,7 +423,7 @@ function initShopNodes() {
 	        	   ]
 	        	}
 	        	];
-	displayShopsOnMap(shops);
+	//displayShopsOnMap(shops);
 	return shops;
 }
 
@@ -697,7 +664,7 @@ function initRouteNodes() {
 	        	   "next":[31, 25]
 	        	 }
 	        	];
-	displayNodesOnMap(nodes, "route");
+	//displayNodesOnMap(nodes, "route");
 	return nodes;
 }
 
@@ -708,41 +675,41 @@ function initEntryNodes() {
 	return entries;
 }
 
+/*
+function loadJSON(callback, file) {   
+    var xobj = new XMLHttpRequest();
+    xobj.overrideMimeType("application/json");
+    xobj.onreadystatechange = function () {
+      if (xobj.readyState == 4 && xobj.status == "200") {
+        // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
+        callback(xobj.responseText);
+      }
+    };
+    xobj.open('GET', file, true); 
+    xobj.send(null);  
+ }
 
-function displayNodesOnMap(nodes, type){
-	$.each(nodes, function(i, obj){
-		showPointOnMap(obj.x, obj.y, type, obj.name);
-	});
+function initShopNodes() {
+	loadJSON(function(response) {
+		var actual_JSON = JSON.parse(response);
+		return actual_JSON;
+		//displayShopsOnMap(actual_JSON);
+	},"shops.json");
 }
 
-function displayShopsOnMap(shops){
-	$.each(shops, function(i, obj){
-		showPointOnMap(obj.coords[0].x, obj.coords[0].y, "shop");
-		if(obj.multiCoords){
-			showPointOnMap(obj.coords[1].x, obj.coords[1].y, "shop");
-		}
-	});
+function initRouteNodes() {
+	loadJSON(function(response) {
+		var actual_JSON = JSON.parse(response);
+		//displayNodesOnMap(actual_JSON, "route");
+		return actual_JSON;
+	},"nodes.json");
 }
 
-function showPointOnMap(x, y, type, name){
-	var canvasVar = document.getElementById("canvas");
-	var canvasContext = canvasVar.getContext("2d");
-	
-	canvasContext.font = "30px Arial";
-		
-	if(type === "shop"){
-		canvasContext.fillStyle = "#AC94CC";
-	} else if(type === "route"){
-		canvasContext.fillStyle = "#FF0000";
-	} else if(type === "entry"){
-		canvasContext.fillStyle = "#0A0DD0";
-	}
-	var radius = type === "shop" ? 8 : 5;
-	
-	canvasContext.beginPath();
-	canvasContext.arc(x, y, radius, 0, 2*Math.PI);
-	canvasContext.fill();
-	if(name){
-		canvasContext.fillText(name, x, y);
-	}	
-} // END : showPointOnMap
+function initEntryNodes() {
+	loadJSON(function(response) {
+		var actual_JSON = JSON.parse(response);
+		return actual_JSON;
+		//displayNodesOnMap(actual_JSON, "entry");
+	},"entry.json");
+}
+*/

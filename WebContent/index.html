@@ -8,16 +8,32 @@
 	<style>
 		html, body {
 			width: 100%;
-			height: 100%;
+			height: 90%;
 			margin: 0px;
 			overflow: hidden;
 		}
+		
+		.back-to-top {
+			width: 60px;
+			height: 60px;
+			text-indent: -9999px;
+			position: fixed;
+			z-index: 999;
+			right: 20px;
+			bottom: 20px;
+			background: #27AE61 url("up-arrow.png") no-repeat center 43%;
+			-webkit-border-radius: 30px;
+			-moz-border-radius: 30px;
+			border-radius: 30px;
+		}
 	</style>
 	<script src="loadMap.js"></script>
-	<script src="appNew.js"></script>
 	<script src="initParams.js"></script>
+	<script src="appNew.js"></script>
+	<script src="drawOnCanvas.js"></script>
 </head>
 <body>
     <canvas id="canvas"></canvas>
+    <button class="back-to-top" onclick="showPaths();">Show Path</button>
 </body>
 </html>
