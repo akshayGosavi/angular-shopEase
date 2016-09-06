@@ -10,10 +10,12 @@ function performRouting(){
  	var shoppingList = ['A','K','S','H','Y'];
  	
  	var shopToVisit = null;
+ 	var shopCoordChosen = null;
  	var firstNodeFromShop = null;
  	var currentRouteNode = null;
  	
  	var movement = [];
+ 	var pathsToShow = [];
  	
  	function getAllPossibleNodesFromShop(node){
  		var nodeArr = [];
@@ -38,31 +40,36 @@ function performRouting(){
  		return dist;
  	}
  	
- 	function getDistaceObjNodeToShop(node, shop, type){
- 		if(shop.multiCoords){
- 			var dist0 = getDistanceBetweenTwoPoints(node, shop.coords[0]);
- 			var dist1 = getDistanceBetweenTwoPoints(node, shop.coords[1]);
- 			if(dist0 <= dist1){
- 				var dist = {
- 		 	 			coord : (type === "preset") ? -1 : 0,
- 		 	 			dist : (type === "preset") ? 999999 : dist0
- 		 	 		};
- 			} else {
- 				var dist = {
- 		 	 			coord : (type === "preset") ? -1 : 1,
- 		 	 			dist : (type === "preset") ? 999999 : dist1
- 		 	 		};
- 			}
+ 	function getDistaceObjNodeToShop(node, shop){
+ 		if(node != null){
+ 			if(shop.multiCoords){
+ 	 			var dist0 = getDistanceBetweenTwoPoints(node, shop.coords[0]);
+ 	 			var dist1 = getDistanceBetweenTwoPoints(node, shop.coords[1]);
+ 	 			if(dist0 <= dist1){
+ 	 				var dist = {
+ 	 		 	 			coord : 0,
+ 	 		 	 			dist : dist0
+ 	 		 	 		};
+ 	 			} else {
+ 	 				var dist = {
+ 	 		 	 			coord : 1,
+ 	 		 	 			dist : dist1
+ 	 		 	 		};
+ 	 			}
+ 	 		} else {
+ 	 			var dist = {
+ 	 	 	 			coord : 0,
+ 	 	 	 			dist : getDistanceBetweenTwoPoints(node, shop.coords[0])
+ 	 	 	 		};
+ 	 		}
  		} else {
  			var dist = {
- 	 	 			coord : (type === "preset") ? -1 : 0,
- 	 	 			dist : (type === "preset") ? 999999 : getDistanceBetweenTwoPoints(node, shop.coords[0])
- 	 	 		};
+	 	 	 			coord : -1,
+	 	 	 			dist : 999999
+	 	 	 		};
  		}
- 		
- 		
- 	 		
- 	 		return dist;
+
+ 		return dist;
  	}
  	
  	function sortAndReturnSmallest(arr){
@@ -87,26 +94,27 @@ function performRouting(){
  			var distanceArr = [];
  			switch (cnt) {
 			case 2:
-				distanceArr.push(getDistaceObjNodeToShop(getRouteNodeByName(nodeList[0]), shopToVisit, null));
-				distanceArr.push(getDistaceObjNodeToShop(getRouteNodeByName(nodeList[1]), shopToVisit, null));
-				distanceArr.push(getDistaceObjNodeToShop(null, shopToVisit, "preset"));
-				distanceArr.push(getDistaceObjNodeToShop(null, shopToVisit, "preset"));
+				distanceArr.push(getDistaceObjNodeToShop(getRouteNodeByName(nodeList[0]), shopToVisit));
+				distanceArr.push(getDistaceObjNodeToShop(getRouteNodeByName(nodeList[1]), shopToVisit));
+				distanceArr.push(getDistaceObjNodeToShop(null, shopToVisit));
+				distanceArr.push(getDistaceObjNodeToShop(null, shopToVisit));
 				break;
 			case 3:
-				distanceArr.push(getDistaceObjNodeToShop(getRouteNodeByName(nodeList[0]), shopToVisit, null));
-				distanceArr.push(getDistaceObjNodeToShop(getRouteNodeByName(nodeList[1]), shopToVisit, null));
-				distanceArr.push(getDistaceObjNodeToShop(getRouteNodeByName(nodeList[2]), shopToVisit, null));
-				distanceArr.push(getDistaceObjNodeToShop(null, shopToVisit, "preset"));
+				distanceArr.push(getDistaceObjNodeToShop(getRouteNodeByName(nodeList[0]), shopToVisit));
+				distanceArr.push(getDistaceObjNodeToShop(getRouteNodeByName(nodeList[1]), shopToVisit));
+				distanceArr.push(getDistaceObjNodeToShop(getRouteNodeByName(nodeList[2]), shopToVisit));
+				distanceArr.push(getDistaceObjNodeToShop(null, shopToVisit));
 				break;
 			case 4:
-				distanceArr.push(getDistaceObjNodeToShop(getRouteNodeByName(nodeList[0]), shopToVisit, null));
-				distanceArr.push(getDistaceObjNodeToShop(getRouteNodeByName(nodeList[1]), shopToVisit, null));
-				distanceArr.push(getDistaceObjNodeToShop(getRouteNodeByName(nodeList[2]), shopToVisit, null));
-				distanceArr.push(getDistaceObjNodeToShop(getRouteNodeByName(nodeList[3]), shopToVisit, null));
+				distanceArr.push(getDistaceObjNodeToShop(getRouteNodeByName(nodeList[0]), shopToVisit));
+				distanceArr.push(getDistaceObjNodeToShop(getRouteNodeByName(nodeList[1]), shopToVisit));
+				distanceArr.push(getDistaceObjNodeToShop(getRouteNodeByName(nodeList[2]), shopToVisit));
+				distanceArr.push(getDistaceObjNodeToShop(getRouteNodeByName(nodeList[3]), shopToVisit));
 				break;
 			}
  			
- 			return  getRouteNodeByName(shopToVisit.coords[sortAndReturnSmallest(distanceArr).coord].node);
+ 			shopCoordChosen = sortAndReturnSmallest(distanceArr).coord;
+ 			return  getRouteNodeByName(shopToVisit.coords[shopCoordChosen].node);
  		}
  	}
  	
@@ -234,16 +242,13 @@ function performRouting(){
  	}
  	
  	function finalizeRouteAndShow(){
- 		//console.log(currentRouteNode.name);
- 		//console.log("->");
+ 		var move = [];
  		$.each(movement, function(i, obj){
- 			console.log(obj.name);
- 			console.log("->");
+ 			move.push(obj.name);
  		});
  		movement = [];
- 		console.log(firstNodeFromShop.name);
- 		console.log("->");
- 		console.log(shopToVisit.name);
+ 		move.push(firstNodeFromShop.name);
+ 		pathsToShow.push({shop: shopToVisit, path: move});
  	}
  	
  	function route(node){
@@ -263,11 +268,52 @@ function performRouting(){
  					nextNode = getRouteNodeByName(commonNodes[0]);
  				}
  			} else {
- 				nextNode = getNodeCloseToSpecificNode(node, firstNodeFromShop); // need to implement
+ 				nextNode = getNodeCloseToSpecificNode(node, firstNodeFromShop); 
  			}
  			route(nextNode);
  		}
  	}
+ 	
+ 	var flagToAlternateMapLineColor = false;
+ 	
+ 	function showPaths(){
+ 		console.log(pathsToShow);
+ 		
+ 		var noOfPaths = pathsToShow.length-1;
+ 		
+ 		for(i = 0 ; i <= noOfPaths ; i++ ){
+ 			var shop = pathsToShow[i].shop;
+ 			var path = pathsToShow[i].path;
+ 			var pathCount = path.length-1;
+ 			
+ 			if(flagToAlternateMapLineColor){
+ 				canvasContext.strokeStyle = "#D41CB0";
+ 				flagToAlternateMapLineColor = false;
+ 			}else {
+ 				canvasContext.strokeStyle = "#24781D";
+ 				flagToAlternateMapLineColor = true;
+ 			}
+ 			
+ 			for(j = 0 ; j < pathCount-1 ; j++){
+ 				var node1 = getRouteNodeByName(path[j]);
+ 				var node2 = getRouteNodeByName(path[j+1]);
+ 				
+ 				drawPath(node1.x, node1.y, node2.x, node2.y);
+ 			}
+
+ 			var lastNode = getRouteNodeByName(path[pathCount-1]);
+ 			drawPath(lastNode.x, lastNode.y, shop.coords[shopCoordChosen].x, shop.coords[shopCoordChosen].y);
+ 			
+ 		}
+ 	}
+ 	
+ 	function drawPath(x1, y1, x2, y2){
+		canvasContext.lineWidth = 5;
+		canvasContext.beginPath();
+		canvasContext.moveTo(x1,y1);
+		canvasContext.lineTo(x2,y2);
+		canvasContext.stroke();
+	} // END : drawPath
  	
  	function theFirstStep(){
  		nodes = initRouteNodes();
@@ -288,6 +334,8 @@ function performRouting(){
  	 				route(currentRouteNode);
  	 			}	 			 	 			
  	 		}while( cnt < shoppingList.length);
+ 	 		
+ 	 		showPaths();
  		} else {
  			console.log("nodes not populated");
  		}
