@@ -1,14 +1,8 @@
 /**
  * Contains All functions related to Drawing on the CANVAS
  * */
-
-function getCanvasContext(){
-	var canvasVar = document.getElementById("canvas");
-	var canvasContext = canvasVar.getContext("2d");
-	
-	return canvasContext;
-}
-
+var canvas = null;
+var ctx = null; 
 
 function displayNodesOnMap(nodes, type){
 	$.each(nodes, function(i, obj){
@@ -26,35 +20,33 @@ function displayShopsOnMap(shops){
 }
 
 function showPointOnMap(x, y, type, name){
-	var canvasContext = getCanvasContext();
-	canvasContext.font = "30px Arial";
+	ctx.font = "30px Arial";
 	var radius = type === "shop" ? 8 : 5;
 	
 	if(type === "shop"){
-		canvasContext.fillStyle = "#AC94CC";
+		ctx.fillStyle = "#AC94CC";
 	} else if(type === "route"){
-		canvasContext.fillStyle = "#FF0000";
+		ctx.fillStyle = "#FF0000";
 	} else if(type === "entry"){
-		canvasContext.fillStyle = "#0A0DD0";
+		ctx.fillStyle = "#0A0DD0";
 	}
 	
-	canvasContext.beginPath();
-	canvasContext.arc(x, y, radius, 0, 2*Math.PI);
-	canvasContext.fill();
+	ctx.beginPath();
+	ctx.arc(x, y, radius, 0, 2*Math.PI);
+	ctx.fill();
 
 	if(name){
-		canvasContext.fillText(name, x, y);
+		ctx.fillText(name, x, y);
 	}	
 }
  	
 function drawPath(x1, y1, x2, y2, color){
-	var canvasContext = getCanvasContext();
-	canvasContext.strokeStyle = color;
-	canvasContext.lineWidth = 5;
-	canvasContext.beginPath();
-	canvasContext.moveTo(x1,y1);
-	canvasContext.lineTo(x2,y2);
-	canvasContext.stroke();
+	ctx.strokeStyle = color;
+	ctx.lineWidth = 5;
+	ctx.beginPath();
+	ctx.moveTo(x1,y1);
+	ctx.lineTo(x2,y2);
+	ctx.stroke();
 } 
 
 
@@ -82,22 +74,24 @@ var cntr = makeCounter();
 function showPaths(){
 	var noOfPaths = pathsToShow.length-1;
 	console.log(cntr.value());
-	
+	 
 	if(cntr.value() <= noOfPaths){
-		showMapAndRoute(pathsToShow[cntr.value()]);
+		globalPathObj = pathsToShow[cntr.value()];
+		redraw();// showMapAndRoute
 		cntr.increment();
 	} else{
 		cntr.reset();
 		console.log("Counter resetted");
-		showMapAndRoute(pathsToShow[cntr.value()]);
+		globalPathObj = pathsToShow[cntr.value()];
+		redraw();// showMapAndRoute
 	}
 	
 }
 
-function showRoute(pathToShow){
-	var shop = pathToShow.shop;
-	var path = pathToShow.path;
-	var coordinate = pathToShow.shopCoordinate;
+function showRoute(){
+	var shop = globalPathObj.shop;
+	var path = globalPathObj.path;
+	var coordinate = globalPathObj.shopCoordinate;
 	var pathCount = path.length-1;	
 	//color =  "#D41CB0";
 	color = "#24781D";
