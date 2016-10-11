@@ -16,7 +16,7 @@ function getEntries(){
 }
 
 function getShoppingList(){
-	var shoppingList = ['A','K','S','H','Y'];
+	var shoppingList = ['M','R','A','K','S','H','Y'];
 	return shoppingList;
 }
 
@@ -105,6 +105,16 @@ function sortAndReturnSmallest(arr){
 	
 	return arr[idOfSmallest];
 }
+
+function sortAndReturn(arr){
+    function SortByDistance(a, b){
+        var aDist = a.dist;
+        var bDist = b.dist;
+        return ((aDist < bDist) ? -1 : ((aDist > bDist) ? 1 : 0));
+    }
+
+    return arr.sort(SortByDistance);
+}
 	
 function areTwoNodesConnected(NodeToCheck ,NodeFrom){
 	var isConnected = false;
@@ -164,7 +174,7 @@ function prepareRoute(){
 	var shoppingList = getShoppingList();
 	var nodes = getNodes();
 	var shops = getShops();
-	
+
 	var shopToVisit = null;
  	var shopCoordChosen = null;
  	var firstNodeFromShop = null;
@@ -232,10 +242,27 @@ function prepareRoute(){
 				distanceArr.push(getDistanceObjNodeToNode(getRouteNodeByName(nodeList[3]), ToNode, null));
 				break;
 			}
- 			
- 			return sortAndReturnSmallest(distanceArr).node;
+            var sortedArr = sortAndReturn(distanceArr);
+            var i = 0;
+            var sortedArrLength = sortedArr.length - 1;
+            var returnNode = null;
+            do{
+                returnNode = sortedArr[i++].node;
+            }while( i <= sortedArrLength && isAlreadyInPath(returnNode.name));
+ 			return returnNode;
  		}
  	}
+
+    function isAlreadyInPath(nodeName){
+        var isPresent = false;
+        $.each(movement, function(i, obj){
+            if(angular.equals(obj.name, nodeName)){
+                isPresent = true;
+            }
+        });
+
+        return isPresent;
+    }
  	
  	function finalizeRoute(){
  		var move = [];
@@ -268,12 +295,26 @@ function prepareRoute(){
  			route(nextNode);
  		}
  	}
- 	
+
+    function determineFirstNode() {
+        var entries = getEntries();
+        var closest = [];
+
+        $.each(entries, function(i, nodeIndex){
+            var node = getRouteNodeByName(nodeIndex);
+            var closeNode = getNodeCloseToShop(node);
+            var distObj = getDistaceObjNodeToShop(closeNode, shopToVisit);
+            closest.push({ node: node, dist: distObj.dist});
+        });
+
+        return sortAndReturnSmallest(closest).node;
+    }
+
  	function theFirstStep(){
  		if( nodes != null && shops != null){
  			var cnt = 0;
  			shopToVisit = getShopNodeByName(shoppingList[cnt]);
- 			firstNodeFromShop = getRouteNodeByName(38); // hand coding start node for time being
+ 			firstNodeFromShop = determineFirstNode();
  	 		do{
  	 			currentRouteNode = firstNodeFromShop;
  	 			shopToVisit = getShopNodeByName(shoppingList[cnt++]);
