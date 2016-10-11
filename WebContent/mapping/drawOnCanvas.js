@@ -94,8 +94,8 @@ function showRoute(){
 	var coordinate = globalPathObj.shopCoordinate;
 	var pathCount = path.length-1;	
 	//color =  "#D41CB0";
-	color = "#24781D";
-	
+	var color = "#24781D";
+
 	for(j = 0 ; j < pathCount ; j++){
 		var node1 = getRouteNodeByName(path[j]);
 		var node2 = getRouteNodeByName(path[j+1]);
