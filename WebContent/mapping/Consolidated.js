@@ -1256,5 +1256,37 @@ function showRoute(){
 	} 
 	
 	var lastNode = getRouteNodeByName(path[pathCount]);
+    showArrow(lastNode.x, lastNode.y, shop.coords[coordinate].x, shop.coords[coordinate].y);
 	drawPath(lastNode.x, lastNode.y, shop.coords[coordinate].x, shop.coords[coordinate].y, color);
+}
+
+function senseDirectionOfRoute(x1,y1,x2,y2){
+    var direction = null;
+    if(x1 == x2){
+        if(y1 <= y2){
+            direction = "down";
+        }else{
+            direction = "up";
+        }
+    }else if (y1 == y2) {
+        if(x1 <= x2){
+            direction = "right";
+        }else{
+            direction = "left";
+        }
+    } else {
+        console.log("cannot find the direction");
+    }
+    return direction;
+}
+
+function showArrow(x1,y1,x2,y2){
+    var direction = senseDirectionOfRoute(x1,y1,x2,y2);
+
+    var img = new Image();
+    img.onload = function(){
+        ctx.drawImage(img,x1,y1);
+    }
+
+    img.src = "glyphicons_free/glyphicons_free/glyphicons/png/glyphicons-arrow-" + direction +".png";
 }
