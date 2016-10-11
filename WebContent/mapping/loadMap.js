@@ -32,8 +32,6 @@ function showMapAndRoute(i){
 	
     ctx.canvas.width = window.innerWidth;
     ctx.canvas.height = window.innerHeight;
-    
-    var canvasOffset = $("#canvas").offset();
 
     var img = new Image();
     img.onload = function(){
