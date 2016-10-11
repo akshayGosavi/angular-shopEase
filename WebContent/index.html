@@ -4,14 +4,14 @@
 	<meta charset="UTF-8">
 	<title>Mapping On Image</title>
 	<script src="jquery-3.1.0.js"></script>
-	
+	<script src="angular/angular.min.js"></script>
 	<style>
 		html, body {
 			width: 100%;
 			height: 100%;
 			margin: 0px;
 			overflow: hidden;
-		} 
+		}
 		
 		.back-to-top {
 			display: none;
@@ -40,20 +40,20 @@
 			height: 97%; 
 		}
 		
-		.canvasConmtext{
+		.canvasContext{
 			position: absolute;
 			z-index: 1;
 		}
 	</style>
-	<script src="loadMap.js"></script>
-	<script src="initParams.js"></script>
-	<script src="appNew.js"></script>
-	<script src="drawOnCanvas.js"></script>
-	<script src="zoomAction.js"></script>
+	<script src="mapping/loadMap.js"></script>
+	<script src="mapping/initParams.js"></script>
+	<script src="mapping/appNew.js"></script>
+	<script src="mapping/drawOnCanvas.js"></script>
+	<script src="mapping/zoomAction.js"></script>
 </head>
 <body>
 	<div id="canvasContainer">
-		<canvas class="canvasConmtext" id="canvas"></canvas>
+		<canvas class="canvasContext" id="canvas"></canvas>
 	</div>
     
     <button class="back-to-top" onclick="showPaths();">Show Path</button>
