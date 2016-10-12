@@ -80,32 +80,46 @@ function showPaths(){
 		redraw();// showMapAndRoute
 		cntr.increment();
 	} else{
-		cntr.reset();
-		console.log("Counter resetted");
-		globalPathObj = pathsToShow[cntr.value()];
+		//cntr.reset();
+		//console.log("Counter resetted");
+		//globalPathObj = pathsToShow[cntr.value()];
+        completedPaths = true;
 		redraw();// showMapAndRoute
 	}
 	
 }
 
 function showRoute(){
-	var shop = globalPathObj.shop;
-	var path = globalPathObj.path;
-	var coordinate = globalPathObj.shopCoordinate;
-	var pathCount = path.length-1;	
-	//color =  "#D41CB0";
-	var color = "#24781D";
+    var color = "#24781D";
+    if(completedPaths){
+        var path = closingPath[0];
+        var pathCount = path.length-1;
+        for(j = 0 ; j < pathCount ; j++) {
+            var node1 = getRouteNodeByName(path[j]);
+            var node2 = getRouteNodeByName(path[j + 1]);
+            showArrow(node1.x, node1.y, node2.x, node2.y);
+            drawPath(node1.x, node1.y, node2.x, node2.y, color);
+        }
 
-	for(j = 0 ; j < pathCount ; j++){
-		var node1 = getRouteNodeByName(path[j]);
-		var node2 = getRouteNodeByName(path[j+1]);
-		
-		drawPath(node1.x, node1.y, node2.x, node2.y, color);
-	} 
-	
-	var lastNode = getRouteNodeByName(path[pathCount]);
-    showArrow(lastNode.x, lastNode.y, shop.coords[coordinate].x, shop.coords[coordinate].y);
-	drawPath(lastNode.x, lastNode.y, shop.coords[coordinate].x, shop.coords[coordinate].y, color);
+        closeRouting();
+    }else{
+        var shop = globalPathObj.shop;
+        var path = globalPathObj.path;
+        var coordinate = globalPathObj.shopCoordinate;
+        var pathCount = path.length-1;
+
+        for(j = 0 ; j < pathCount ; j++){
+            var node1 = getRouteNodeByName(path[j]);
+            var node2 = getRouteNodeByName(path[j+1]);
+            showArrow(node1.x, node1.y, node2.x, node2.y);
+            drawPath(node1.x, node1.y, node2.x, node2.y, color);
+        }
+
+        var lastNode = getRouteNodeByName(path[pathCount]);
+        showArrow(lastNode.x, lastNode.y, shop.coords[coordinate].x, shop.coords[coordinate].y);
+        drawPath(lastNode.x, lastNode.y, shop.coords[coordinate].x, shop.coords[coordinate].y, color);
+    }
+
 }
 
 function senseDirectionOfRoute(x1,y1,x2,y2){

@@ -3,6 +3,7 @@
  * */
 $(function(){
 	//showMap();
+    $("#finishedMsg").hide();
 	prepareRoute();
 });
 

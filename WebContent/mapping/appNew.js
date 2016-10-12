@@ -1,4 +1,6 @@
 var pathsToShow = [];
+var closingPath = [];
+var completedPaths = false;
 
 function getNodes(){
 	var nodes = initRouteNodes();
@@ -174,6 +176,7 @@ function prepareRoute(){
 	var shoppingList = getShoppingList();
 	var nodes = getNodes();
 	var shops = getShops();
+    var entries = getEntries();
 
 	var shopToVisit = null;
  	var shopCoordChosen = null;
@@ -273,6 +276,16 @@ function prepareRoute(){
  		move.push(firstNodeFromShop.name);
  		pathsToShow.push({shop: shopToVisit, shopCoordinate: shopCoordChosen, path: move});
  	}
+
+    function closeRoute(){
+        var move = [];
+        $.each(movement, function(i, obj){
+            move.push(obj.name);
+        });
+        movement = [];
+        move.push(firstNodeFromShop.name);
+        closingPath.push(move);
+    }
  	
  	function route(node){
  		if(areTwoNodesConnected(firstNodeFromShop, node)){
@@ -296,8 +309,26 @@ function prepareRoute(){
  		}
  	}
 
+    function routeEntry(node){
+        if(areTwoNodesConnected(firstNodeFromShop, node)){
+            movement.push(node);
+            closeRoute();
+        } else {
+            movement.push(node);
+            var nextNode = null;
+            var commonNodes = getCommonNodesElseNull(firstNodeFromShop, node);
+
+            if( commonNodes != null){
+                movement.push(getRouteNodeByName(commonNodes[0]));
+                closeRoute();
+            } else {
+                nextNode = getNodeCloseToSpecificNode(node, firstNodeFromShop);
+                routeEntry(nextNode);
+            }
+        }
+    }
+
     function determineFirstNode() {
-        var entries = getEntries();
         var closest = [];
 
         $.each(entries, function(i, nodeIndex){
@@ -325,12 +356,41 @@ function prepareRoute(){
  	 				route(currentRouteNode);
  	 			}	 			 	 			
  	 		}while( cnt < shoppingList.length);
+            currentRouteNode = firstNodeFromShop;
+            firstNodeFromShop = getclosestEntryNode(firstNodeFromShop);
+            while(closingPath.length == 0){
+                if(currentRouteNode === firstNodeFromShop){
+                    break;
+                } else{
+                    routeEntry(currentRouteNode);
+                }
+            }
+            closeRoute();
  	 		console.log("Done Preparation.")
  	 		console.log(pathsToShow);
  		} else {
  			console.log("nodes not populated");
  		}
  	}
- 	
- 	theFirstStep();
+
+    function getclosestEntryNode(lastNode){
+        var closest = [];
+
+        $.each(entries, function(i, nodeIndex){
+            var node = getRouteNodeByName(nodeIndex);
+            var distObj = getDistanceObjNodeToNode(lastNode, node, null);
+            closest.push({ node: node, dist: distObj.dist});
+        });
+
+        return sortAndReturnSmallest(closest).node;
+    }
+
+   theFirstStep();
+}
+
+function closeRouting(){
+    $("#canvasContainer").hide();
+    $("#finishedMsg").show();
+    $("#btnNextRoute").hide();
+
 }
