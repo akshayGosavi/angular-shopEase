@@ -370,6 +370,7 @@ function prepareRoute(){
  	 		console.log(pathsToShow);
  		} else {
  			console.log("nodes not populated");
+            $("#btnNextRoute").hide();
  		}
  	}
 
